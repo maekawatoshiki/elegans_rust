@@ -12,7 +12,7 @@ pub struct Compile<'a, 'ctx> {
     pub module: &'a Module<'ctx>,
 }
 
-impl<'a, 'ctx: 'a> Compile<'a, 'ctx> {
+impl<'a, 'ctx> Compile<'a, 'ctx> {
     pub fn new(
         context: &'ctx Context,
         builder: &'a Builder<'ctx>,
@@ -25,7 +25,7 @@ impl<'a, 'ctx: 'a> Compile<'a, 'ctx> {
         }
     }
     fn compile_stmt(
-        &'ctx self,
+        &self,
         stmts: &'a [Stmt],
         env: &mut std::collections::HashMap<&'a str, inkwell::values::IntValue<'a>>,
     ) -> IntValue {
@@ -47,7 +47,7 @@ impl<'a, 'ctx: 'a> Compile<'a, 'ctx> {
             _ => panic!(),
         }
     }
-    fn compile_expr(&'ctx self, expr: &'ctx Expr) -> IntValue<'ctx> {
+    fn compile_expr(&self, expr: &Expr) -> IntValue<'ctx> {
         match expr {
             Expr::Number(num) => self.context.i64_type().const_int(*num as u64, false),
             Expr::BinOp(Token::Op(str), lh, rh) => match &str as &str {
@@ -74,7 +74,7 @@ impl<'a, 'ctx: 'a> Compile<'a, 'ctx> {
             _ => panic!(),
         }
     }
-    pub fn add_main(&'ctx self, ast: &'ctx [Stmt]) {
+    pub fn add_main(&self, ast: &[Stmt]) {
         let main_type = self.context.i64_type().fn_type(&[], false);
         let main = self.module.add_function("main", main_type, None);
         let main_block = self.context.append_basic_block(main, "entry");
